@@ -1,6 +1,6 @@
 # PalmReaderAI - Created for GDG Kütahya by Barış Güleç
 
-**PalmReaderAI** is a Flask-based web application designed to generate personalized palm readings from uploaded hand images. This project uses advanced AI models such as Groq(llama-3.2-90b-vision-preview) and Gemini to deliver insightful and engaging results in Turkish.
+**PalmReaderAI** is a Flask-based web application designed to generate personalized palm readings from uploaded hand images. This project leverages cutting-edge AI models like Groq (llama-3.2-90b-vision-preview) and Gemini to create meaningful and engaging palm reading results, translated beautifully into Turkish.
 
 ---
 
