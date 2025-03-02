@@ -1,5 +1,5 @@
 streamlit
 pillow
-groq-sdk
+groq
 google-generativeai
 python-dotenv
