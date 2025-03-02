@@ -5,15 +5,11 @@ import re
 import google.generativeai as genai
 from PIL import Image
 from io import BytesIO
-from dotenv import load_dotenv
 from groq import Groq
 
-# .env dosyasından API anahtarlarını yükle
-load_dotenv()
-
-# API anahtarlarını ortam değişkenlerinden al
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-genai.configure(api_key=os.getenv("GENAI_API_KEY"))
+# API anahtarlarını Streamlit secrets'dan al
+client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 def format_reading_dynamically(text):
     formatted_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", text)
@@ -109,9 +105,10 @@ st.title("Palm Reader AI")
 user_name = st.text_input("Adınızı girin:")
 uploaded_file = st.file_uploader("Avuç içi resminizi yükleyin", type=["jpg", "jpeg", "png"])
 
-if st.button("Avuç İçi Analizi Yap") and user_name and uploaded_file:
-    with st.spinner("Analiz ediliyor..."):
-        result = generate_palm_reading(uploaded_file, user_name)
-    st.markdown(result, unsafe_allow_html=True)
-elif st.button("Avuç İçi Analizi Yap"):
-    st.error("Lütfen hem adınızı girin hem de bir resim yükleyin!")
+if st.button("Avuç İçi Analizi Yap", key="analyze_button"):
+    if user_name and uploaded_file:
+        with st.spinner("Analiz ediliyor..."):
+            result = generate_palm_reading(uploaded_file, user_name)
+        st.markdown(result, unsafe_allow_html=True)
+    else:
+        st.error("Lütfen hem adınızı girin hem de bir resim yükleyin!")
