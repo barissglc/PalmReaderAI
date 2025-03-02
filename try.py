@@ -15,179 +15,198 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Modern CSS stilleri
+# Streamlit varsayılan CSS değerlerini override eden ve üst boşluğu tamamen kaldıran stil
 st.markdown("""
 <style>
-:root {
-    --primary-color: #764ba2;
-    --secondary-color: #667eea;
-    --bg-light: #f5f5f5;
-    --white: #ffffff;
-    --shadow-light: rgba(0, 0, 0, 0.1);
-}
-
-body {
-    font-family: 'Roboto', sans-serif;
-    background: var(--bg-light);
-    margin: 0;
-    padding: 0;
-}
-
-.stApp {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-}
-
-/* Üst kısım için dekoratif elementler */
-.decorative-pattern {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 200px;
-    background: 
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
-    pointer-events: none;
-}
-
-.stars-pattern {
-    position: absolute;
-    top: 20px;
-    left: 0;
-    right: 0;
-    height: 100px;
-    background-image: 
-        radial-gradient(white 1px, transparent 1px),
-        radial-gradient(white 1px, transparent 1px);
-    background-size: 50px 50px;
-    background-position: 0 0, 25px 25px;
-    opacity: 0.1;
-    animation: twinkle 3s infinite alternate;
-}
-
-@keyframes twinkle {
-    from {opacity: 0.05;}
-    to {opacity: 0.15;}
-}
-
-.main {
-    position: relative;
-    background: var(--white);
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 8px 16px var(--shadow-light);
-    max-width: 900px;
-    margin: 1rem auto;
-    z-index: 1;
-}
-
-.title-container {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    padding: 2rem;
-    margin: 1rem auto 1.5rem;
-    backdrop-filter: blur(10px);
-    text-align: center;
-    max-width: 800px;
-    position: relative;
-    z-index: 2;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.title {
-    color: var(--white);
-    font-size: 3rem;
-    font-weight: 700;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-    margin-bottom: 0.5rem;
-    letter-spacing: 1px;
-}
-
-.subtitle {
-    color: var(--white);
-    font-size: 1.25rem;
-    font-style: italic;
-    opacity: 0.9;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
-
-.input-container {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 4px 8px var(--shadow-light);
-    margin-bottom: 1.5rem;
-}
-
-.analyze-button {
-    background-color: var(--primary-color);
-    color: var(--white);
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 2rem;
-    margin-top: 1.5rem;
-    cursor: pointer;
-    transition: transform 0.2s ease, filter 0.2s ease;
-    width: 100%;
-}
-
-.analyze-button:hover {
-    transform: scale(1.02);
-    filter: brightness(90%);
-}
-
-.result-container {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 4px 8px var(--shadow-light);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.loading-spinner {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.footer {
-    color: var(--white);
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 0.875rem;
-    opacity: 0.8;
-}
-
-b {
-    color: var(--primary-color);
-    font-weight: bold;
-    background: rgba(118, 75, 162, 0.1);
-    padding: 2px 6px;
-    border-radius: 3px;
-    margin: 3px 0;
-    display: inline-block;
-}
-
-/* Responsive düzenlemeler */
-@media (max-width: 768px) {
+    /* Streamlit varsayılan container stillerini override etme */
+    .block-container {
+        padding-top: 0 !important;
+        padding-bottom: 1rem !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Header alanını tamamen kaplayan banner */
+    .header-banner {
+        position: relative;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 100%;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    @keyframes gradient {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    
+    /* Yıldız animasyonu */
+    .stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+    }
+    
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 2s infinite alternate;
+        opacity: 0.7;
+    }
+    
+    @keyframes twinkle {
+        0% {opacity: 0.3; transform: scale(0.8);}
+        100% {opacity: 1; transform: scale(1.2);}
+    }
+    
+    /* Başlık konteyner stilleri */
+    .title-wrapper {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 0 1rem;
+    }
+    
+    .title-container {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 2rem;
+        backdrop-filter: blur(5px);
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        z-index: 10;
+    }
+    
     .title {
-        font-size: 2.5rem;
+        color: white;
+        font-size: 3rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+        margin-bottom: 0.5rem;
+        letter-spacing: 1px;
+        line-height: 1.2;
     }
+    
     .subtitle {
-        font-size: 1rem;
+        color: white;
+        font-size: 1.25rem;
+        font-style: italic;
+        opacity: 0.9;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
     }
+    
+    /* İçerik container stilleri */
     .input-container {
-        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(118, 75, 162, 0.1);
     }
-}
+    
+    .result-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(118, 75, 162, 0.1);
+    }
+    
+    /* Footer stili */
+    .footer {
+        color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.875rem;
+        padding: 1rem 0;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Diğer stil ayarları */
+    b {
+        color: #764ba2;
+        font-weight: bold;
+        background: rgba(118, 75, 162, 0.1);
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin: 3px 0;
+        display: inline-block;
+    }
+    
+    /* Responsive ayarlar */
+    @media (max-width: 768px) {
+        .title {
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            font-size: 1rem;
+        }
+        .input-container {
+            padding: 1.5rem;
+        }
+    }
+    
+    /* Streamlit spinner ve button stilleri */
+    .stSpinner {
+        text-align: center;
+    }
+    
+    .stSpinner > div {
+        border-top-color: #764ba2 !important;
+    }
+    
+    div.stButton > button {
+        background-color: #764ba2;
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    div.stButton > button:hover {
+        background-color: #6a3d96;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Dekoratif elementler
-st.markdown('<div class="decorative-pattern"></div>', unsafe_allow_html=True)
-st.markdown('<div class="stars-pattern"></div>', unsafe_allow_html=True)
+# JavaScript ile dinamik yıldız oluşturma
+st.markdown("""
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelector('.stars');
+    if (stars) {
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            stars.appendChild(star);
+        }
+    }
+});
+</script>
+""", unsafe_allow_html=True)
 
 # API anahtarlarını Streamlit secrets'dan al
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
@@ -281,10 +300,15 @@ def translate_to_turkish(english_text, user_name):
     except Exception as e:
         return f"Çeviri hatası: {str(e)}"
 
-# Ana içerik bölümü
+# Tam sayfa boyunca uzanan banner header
+st.markdown('<div class="header-banner">', unsafe_allow_html=True)
+st.markdown('<div class="stars"></div>', unsafe_allow_html=True)
+st.markdown('<div class="title-wrapper">', unsafe_allow_html=True)
 st.markdown('<div class="title-container">', unsafe_allow_html=True)
 st.markdown('<h1 class="title">✨ Avuç İçi Okuyucu AI ✨</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Yapay zeka ile geleceğinizi keşfedin</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Kullanıcı giriş bölümü
