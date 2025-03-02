@@ -7,6 +7,142 @@ from PIL import Image
 from io import BytesIO
 from groq import Groq
 
+# Sayfa konfigürasyonu ve tema ayarları
+st.set_page_config(
+    page_title="Avuç İçi Okuyucu AI",
+    page_icon="🔮",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# Modern CSS stilleri
+st.markdown("""
+<style>
+:root {
+    --primary-color: #764ba2;
+    --secondary-color: #667eea;
+    --bg-light: #f5f5f5;
+    --white: #ffffff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg-light);
+    margin: 0;
+    padding: 0;
+}
+
+.stApp {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+}
+
+.main {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 16px var(--shadow-light);
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+.title-container {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.title {
+    color: var(--white);
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--white);
+    font-size: 1.25rem;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.input-container {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 8px var(--shadow-light);
+    margin-bottom: 1.5rem;
+}
+
+.analyze-button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    margin-top: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    width: 100%;
+}
+
+.analyze-button:hover {
+    transform: scale(1.02);
+    filter: brightness(90%);
+}
+
+.result-container {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 8px var(--shadow-light);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.loading-spinner {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.footer {
+    color: var(--white);
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+b {
+    color: var(--primary-color);
+    font-weight: bold;
+    background: rgba(118, 75, 162, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin: 3px 0;
+    display: inline-block;
+}
+
+/* Responsive düzenlemeler */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5rem;
+    }
+    .subtitle {
+        font-size: 1rem;
+    }
+    .input-container {
+        padding: 1.5rem;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+
 # API anahtarlarını Streamlit secrets'dan al
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
@@ -60,7 +196,7 @@ def generate_palm_reading(image_file, user_name):
         formatted_reading = format_reading_dynamically(turkish_reading)
         return formatted_reading
     except Exception as e:
-        return f"An error occurred during palm reading: {str(e)}"
+        return f"Avuç içi analizi sırasında bir hata oluştu: {str(e)}"
 
 def translate_to_turkish(english_text, user_name):
     try:
@@ -97,18 +233,45 @@ def translate_to_turkish(english_text, user_name):
 
         return response.text
     except Exception as e:
-        return f"Translation error: {str(e)}"
+        return f"Çeviri hatası: {str(e)}"
 
-# Streamlit arayüzü
-st.title("Palm Reader AI")
+# Ana içerik bölümü
+st.markdown('<div class="title-container">', unsafe_allow_html=True)
+st.markdown('<h1 class="title">✨ Avuç İçi Okuyucu AI ✨</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Yapay zeka ile geleceğinizi keşfedin</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-user_name = st.text_input("Adınızı girin:")
-uploaded_file = st.file_uploader("Avuç içi resminizi yükleyin", type=["jpg", "jpeg", "png"])
+# Kullanıcı giriş bölümü
+st.markdown('<div class="input-container">', unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
-if st.button("Avuç İçi Analizi Yap", key="analyze_button"):
+with col1:
+    st.markdown("<h3 style='text-align: center;'>Kişisel Bilgiler</h3>", unsafe_allow_html=True)
+    user_name = st.text_input("Adınızı girin:", placeholder="Adınızı buraya yazın...")
+
+with col2:
+    st.markdown("<h3 style='text-align: center;'>Avuç İçi Görüntüsü</h3>", unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Avuç içi resminizi yükleyin:", type=["jpg", "jpeg", "png"])
+    if uploaded_file:
+        st.image(uploaded_file, width=200, caption="Yüklenen görüntü")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Analiz butonu
+analyze_clicked = st.button("🔮 Avuç İçi Analizi Yap", key="analyze_button", use_container_width=True)
+
+# Sonuç işleme
+if analyze_clicked:
     if user_name and uploaded_file:
-        with st.spinner("Analiz ediliyor..."):
+        with st.spinner("🪄 Avuç içiniz analiz ediliyor... Lütfen bekleyin..."):
             result = generate_palm_reading(uploaded_file, user_name)
+        st.markdown('<div class="result-container">', unsafe_allow_html=True)
         st.markdown(result, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     else:
-        st.error("Lütfen hem adınızı girin hem de bir resim yükleyin!")
+        st.error("❗ Lütfen hem adınızı girin hem de bir avuç içi resmi yükleyin!")
+
+# Footer
+st.markdown('<div class="footer">', unsafe_allow_html=True)
+st.markdown('© 2025 Avuç İçi Fal AI | Barış Güleç tarafından geliştirildi', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
