@@ -11,39 +11,59 @@ from groq import Groq
 st.set_page_config(
     page_title="Avuç İçi Okuyucu AI",
     page_icon="🔮",
-    layout="centered",
+    layout="wide",  # Tam genişlik için wide kullanıyoruz
     initial_sidebar_state="collapsed"
 )
 
-# Streamlit varsayılan CSS değerlerini override eden ve üst boşluğu tamamen kaldıran stil
+# Tüm varsayılan stilleri override eden CSS
 st.markdown("""
 <style>
-    /* Streamlit varsayılan container stillerini override etme */
-    .block-container {
+    /* Tüm varsayılan stilleri sıfırla */
+    html, body, [class*="css"] {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* En üst düzey container */
+    .main > div:first-child {
         padding-top: 0 !important;
-        padding-bottom: 1rem !important;
-        margin-top: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
-    
-    /* Header alanını tamamen kaplayan banner */
-    .header-banner {
-        position: relative;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* Streamlit'in tüm default container'larını sıfırla */
+    .block-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* Tüm gövdeyi kaplayan arkaplan */
+    .body-background {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        z-index: -1;
     }
-    
-    @keyframes gradient {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
+
+    /* Üst banner */
+    .header-card {
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0 auto;
+        padding: 3rem 1rem 1rem 1rem;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        position: relative;
     }
-    
+
     /* Yıldız animasyonu */
     .stars {
         position: absolute;
@@ -51,162 +71,161 @@ st.markdown("""
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 0;
-        overflow: hidden;
+        pointer-events: none;
     }
-    
-    .star {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background: white;
-        border-radius: 50%;
-        animation: twinkle 2s infinite alternate;
-        opacity: 0.7;
-    }
-    
-    @keyframes twinkle {
-        0% {opacity: 0.3; transform: scale(0.8);}
-        100% {opacity: 1; transform: scale(1.2);}
-    }
-    
-    /* Başlık konteyner stilleri */
-    .title-wrapper {
-        position: relative;
-        z-index: 1;
-        text-align: center;
+
+    /* Ana içerik container */
+    .main-content {
+        width: 90%;
+        max-width: 1200px;
+        margin: 2rem auto;
         padding: 0 1rem;
     }
-    
+
+    /* Başlık konteyner stilleri */
     .title-container {
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
+        text-align: center;
         padding: 2rem;
-        backdrop-filter: blur(5px);
-        max-width: 800px;
-        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        position: relative;
-        z-index: 10;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        transform: translateZ(0);
     }
-    
+
+    /* Başlık ve alt başlık */
     .title {
         color: white;
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 700;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
-        margin-bottom: 0.5rem;
-        letter-spacing: 1px;
+        text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        margin: 0;
+        padding: 0;
         line-height: 1.2;
     }
-    
+
     .subtitle {
-        color: white;
+        color: rgba(255, 255, 255, 0.9);
         font-size: 1.25rem;
         font-style: italic;
-        opacity: 0.9;
-        text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        margin-top: 0.5rem;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
-    
-    /* İçerik container stilleri */
-    .input-container {
+
+    /* İçerik kartları */
+    .content-card {
         background: white;
-        border-radius: 12px;
+        border-radius: 15px;
         padding: 2rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(118, 75, 162, 0.1);
     }
-    
-    .result-container {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-        border: 1px solid rgba(118, 75, 162, 0.1);
-    }
-    
-    /* Footer stili */
-    .footer {
-        color: rgba(255, 255, 255, 0.8);
+
+    /* Başlıklar */
+    .section-header {
+        color: #764ba2;
         text-align: center;
-        margin-top: 2rem;
-        font-size: 0.875rem;
-        padding: 1rem 0;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
     }
-    
-    /* Diğer stil ayarları */
+
+    /* Resim yükleme alanı */
+    .uploadFile > div > div {
+        border: 2px dashed #764ba2 !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+        background: rgba(118, 75, 162, 0.05) !important;
+    }
+
+    /* Analiz butonu */
+    div.stButton > button {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+        color: white !important;
+        font-weight: bold !important;
+        border: none !important;
+        padding: 0.75rem 2rem !important;
+        border-radius: 50px !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+        font-size: 1.1rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3) !important;
+    }
+
+    div.stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(118, 75, 162, 0.4) !important;
+    }
+
+    div.stButton > button:active {
+        transform: translateY(1px) !important;
+    }
+
+    /* Sonuç kartı özel stilleri */
+    .result-container {
+        border-left: 5px solid #764ba2;
+        line-height: 1.8;
+    }
+
     b {
         color: #764ba2;
         font-weight: bold;
         background: rgba(118, 75, 162, 0.1);
-        padding: 2px 6px;
-        border-radius: 3px;
-        margin: 3px 0;
+        padding: 3px 8px;
+        border-radius: 4px;
+        margin: 2px 0;
         display: inline-block;
     }
-    
-    /* Responsive ayarlar */
-    @media (max-width: 768px) {
-        .title {
-            font-size: 2.5rem;
-        }
-        .subtitle {
-            font-size: 1rem;
-        }
-        .input-container {
-            padding: 1.5rem;
-        }
-    }
-    
-    /* Streamlit spinner ve button stilleri */
-    .stSpinner {
+
+    /* Footer stili */
+    .footer {
         text-align: center;
+        color: white;
+        padding: 2rem 0;
+        font-size: 0.875rem;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        margin-top: 2rem;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
+    /* Spinner stilleri */
     .stSpinner > div {
         border-top-color: #764ba2 !important;
     }
-    
-    div.stButton > button {
-        background-color: #764ba2;
-        color: white;
-        font-weight: bold;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+
+    /* Hata mesajı stilleri */
+    .stAlert {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #764ba2 !important;
+        border-color: #764ba2 !important;
     }
     
-    div.stButton > button:hover {
-        background-color: #6a3d96;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+    /* Responsive stilller */
+    @media screen and (max-width: 768px) {
+        .title {
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+        }
+        
+        .content-card {
+            padding: 1.5rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# JavaScript ile dinamik yıldız oluşturma
-st.markdown("""
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelector('.stars');
-    if (stars) {
-        for (let i = 0; i < 100; i++) {
-            const star = document.createElement('div');
-            star.classList.add('star');
-            star.style.top = `${Math.random() * 100}%`;
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.animationDelay = `${Math.random() * 2}s`;
-            stars.appendChild(star);
-        }
-    }
-});
-</script>
-""", unsafe_allow_html=True)
+# Sayfa arkaplanı - sayfayı tamamen kaplamak için
+st.markdown('<div class="body-background"></div>', unsafe_allow_html=True)
 
 # API anahtarlarını Streamlit secrets'dan al
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
@@ -300,27 +319,28 @@ def translate_to_turkish(english_text, user_name):
     except Exception as e:
         return f"Çeviri hatası: {str(e)}"
 
-# Tam sayfa boyunca uzanan banner header
-st.markdown('<div class="header-banner">', unsafe_allow_html=True)
+# Yeni HTML yapısı - tüm içeriği bir container içine alarak
+st.markdown('<div class="main-content">', unsafe_allow_html=True)
+
+# Üst header bölümü
+st.markdown('<header class="header-card">', unsafe_allow_html=True)
 st.markdown('<div class="stars"></div>', unsafe_allow_html=True)
-st.markdown('<div class="title-wrapper">', unsafe_allow_html=True)
 st.markdown('<div class="title-container">', unsafe_allow_html=True)
 st.markdown('<h1 class="title">✨ Avuç İçi Okuyucu AI ✨</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Yapay zeka ile geleceğinizi keşfedin</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</header>', unsafe_allow_html=True)
 
 # Kullanıcı giriş bölümü
-st.markdown('<div class="input-container">', unsafe_allow_html=True)
+st.markdown('<div class="content-card">', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("<h3 style='text-align: center;'>Kişisel Bilgiler</h3>", unsafe_allow_html=True)
+    st.markdown('<h3 class="section-header">Kişisel Bilgiler</h3>', unsafe_allow_html=True)
     user_name = st.text_input("Adınızı girin:", placeholder="Adınızı buraya yazın...")
 
 with col2:
-    st.markdown("<h3 style='text-align: center;'>Avuç İçi Görüntüsü</h3>", unsafe_allow_html=True)
+    st.markdown('<h3 class="section-header">Avuç İçi Görüntüsü</h3>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("Avuç içi resminizi yükleyin:", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         st.image(uploaded_file, width=200, caption="Yüklenen görüntü")
@@ -335,13 +355,60 @@ if analyze_clicked:
     if user_name and uploaded_file:
         with st.spinner("🪄 Avuç içiniz analiz ediliyor... Lütfen bekleyin..."):
             result = generate_palm_reading(uploaded_file, user_name)
-        st.markdown('<div class="result-container">', unsafe_allow_html=True)
+        st.markdown('<div class="content-card result-container">', unsafe_allow_html=True)
         st.markdown(result, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.error("❗ Lütfen hem adınızı girin hem de bir avuç içi resmi yükleyin!")
 
-# Footer
-st.markdown('<div class="footer">', unsafe_allow_html=True)
-st.markdown('© 2025 Avuç İçi Fal AI | Barış Güleç tarafından geliştirildi', unsafe_allow_html=True)
+# Ana içerik div'ini kapat
 st.markdown('</div>', unsafe_allow_html=True)
+
+# Footer - sayfanın en altında olacak şekilde
+st.markdown('<footer class="footer">', unsafe_allow_html=True)
+st.markdown('© 2025 Avuç İçi Fal AI | Barış Güleç tarafından geliştirildi', unsafe_allow_html=True)
+st.markdown('</footer>', unsafe_allow_html=True)
+
+# Yıldız animasyonu için JavaScript
+st.markdown("""
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Yıldız elementlerini oluştur
+    var stars = document.querySelector('.stars');
+    if (stars) {
+        for (var i = 0; i < 150; i++) {
+            var star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.width = (Math.random() * 2 + 1) + 'px';
+            star.style.height = (Math.random() * 2 + 1) + 'px';
+            star.style.backgroundColor = 'white';
+            star.style.borderRadius = '50%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animationDuration = (Math.random() * 3 + 1) + 's';
+            star.style.animationDelay = Math.random() + 's';
+            star.style.animationTimingFunction = 'ease-in-out';
+            star.style.animationIterationCount = 'infinite';
+            star.style.animationDirection = 'alternate';
+            star.style.animationName = 'twinkle';
+            star.style.opacity = Math.random() * 0.7 + 0.3;
+            
+            stars.appendChild(star);
+        }
+    }
+});
+
+// Twinkle animasyonu tanımla
+if (!document.querySelector('#star-animation')) {
+    var style = document.createElement('style');
+    style.id = 'star-animation';
+    style.textContent = `
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.7); }
+            100% { opacity: 1; transform: scale(1.3); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+</script>
+""", unsafe_allow_html=True)
