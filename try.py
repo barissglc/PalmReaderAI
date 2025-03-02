@@ -37,22 +37,62 @@ body {
     background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
 }
 
+/* Üst kısım için dekoratif elementler */
+.decorative-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+    pointer-events: none;
+}
+
+.stars-pattern {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background-image: 
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: 0 0, 25px 25px;
+    opacity: 0.1;
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+    from {opacity: 0.05;}
+    to {opacity: 0.15;}
+}
+
 .main {
+    position: relative;
     background: var(--white);
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 8px 16px var(--shadow-light);
     max-width: 900px;
-    margin: 2rem auto;
+    margin: 1rem auto;
+    z-index: 1;
 }
 
 .title-container {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     padding: 2rem;
-    margin-bottom: 1.5rem;
+    margin: 1rem auto 1.5rem;
     backdrop-filter: blur(10px);
     text-align: center;
+    max-width: 800px;
+    position: relative;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .title {
@@ -61,6 +101,7 @@ body {
     font-weight: 700;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
     margin-bottom: 0.5rem;
+    letter-spacing: 1px;
 }
 
 .subtitle {
@@ -68,6 +109,7 @@ body {
     font-size: 1.25rem;
     font-style: italic;
     opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
 .input-container {
@@ -142,6 +184,10 @@ b {
 }
 </style>
 """, unsafe_allow_html=True)
+
+# Dekoratif elementler
+st.markdown('<div class="decorative-pattern"></div>', unsafe_allow_html=True)
+st.markdown('<div class="stars-pattern"></div>', unsafe_allow_html=True)
 
 # API anahtarlarını Streamlit secrets'dan al
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
