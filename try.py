@@ -37,14 +37,6 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     
-    /* Özel kart stili */
-    .content-card {
-        background-color: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
     
     /* Bölüm başlıkları */
     .section-header {
